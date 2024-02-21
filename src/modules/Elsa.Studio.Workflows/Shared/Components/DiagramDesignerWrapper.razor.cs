@@ -54,6 +54,9 @@ public partial class DiagramDesignerWrapper
     [Parameter]
     public RenderFragment? CustomToolbarItems { get; set; }
 
+    [CascadingParameter]
+    public WorkflowInstanceViewer WorkflowInstanceViewer { get; set; }
+    
     /// <summary>
     /// Whether the designer is progressing.
     /// </summary>
@@ -329,6 +332,8 @@ public partial class DiagramDesignerWrapper
         // If the activity is a workflow definition activity, then open the workflow definition editor.
         if (activity.GetWorkflowDefinitionId() != null)
         {
+            await WorkflowInstanceViewer.UpdateWorkflowDefinition(activity.GetId());
+            
             await OnActivityEmbeddedPortSelected(new ActivityEmbeddedPortSelectedArgs(activity, "Root"));
         }
     }

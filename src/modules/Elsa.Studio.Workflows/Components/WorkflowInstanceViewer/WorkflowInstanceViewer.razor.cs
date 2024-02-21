@@ -23,12 +23,14 @@ public partial class WorkflowInstanceViewer
     /// <summary>
     /// The ID of the workflow instance to view.
     /// </summary>
-    [Parameter] public string InstanceId { get; set; } = default!;
+    [Parameter]
+    public string InstanceId { get; set; } = default!;
 
     /// <summary>
     /// An event that is invoked when a workflow definition is edited.
     /// </summary>
-    [Parameter] public EventCallback<string> EditWorkflowDefinition { get; set; }
+    [Parameter]
+    public EventCallback<string> EditWorkflowDefinition { get; set; }
 
     [Inject] private IWorkflowInstanceService WorkflowInstanceService { get; set; } = default!;
 
@@ -42,7 +44,7 @@ public partial class WorkflowInstanceViewer
     {
         var instance = await WorkflowInstanceService.GetAsync(InstanceId) ?? throw new InvalidOperationException($"Workflow instance with ID {InstanceId} not found.");
         var definitionVersionIds = new[] { instance.DefinitionVersionId };
-        var response = await WorkflowDefinitionService.FindManyByIdAsync(definitionVersionIds, true);
+        var response = await WorkflowDefinitionService.FindManyByIdAsync(definitionVersionIds, true);//this should be false
         _workflowInstances = new List<WorkflowInstance> { instance };
         _workflowDefinitions = response.ToList();
         await SelectWorkflowInstanceAsync(instance);
@@ -87,5 +89,12 @@ public partial class WorkflowInstanceViewer
     {
         Journal.ClearSelection();
         return Task.CompletedTask;
+    }
+
+    public async Task UpdateWorkflowDefinition(string workflowVersionId)
+    {
+        //var records=(await InvokeWithBlazorServiceContext(() => WorkflowDefinitionService.FindManyByIdAsync(new[] { "15a8002215b4da89" }, true))).ToList();
+
+        //_workflowDefinitions = records;
     }
 }

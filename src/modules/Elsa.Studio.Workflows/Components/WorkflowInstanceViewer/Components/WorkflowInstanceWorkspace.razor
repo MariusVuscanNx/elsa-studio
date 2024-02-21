@@ -16,12 +16,11 @@
                             ApplyEffectsToContainer>
                 @foreach (var workflowInstance in WorkflowInstances)
                 {
-                    var definition = WorkflowDefinitions.First(x => x.Id == workflowInstance.DefinitionVersionId);
                     <MudTabPanel Text="@workflowInstance.Id" ShowCloseIcon="false" Style="height: 100%">
                         <WorkflowInstanceDesigner
                              @ref="@_workflowInstanceDesigner"
                             WorkflowInstance="workflowInstance" 
-                            WorkflowDefinition="definition" 
+                            WorkflowDefinition="SelectedWorkflowDefinition" 
                             PathChanged="OnPathChanged" 
                             ActivitySelected="ActivitySelected"
                             SelectedWorkflowExecutionLogRecord="SelectedWorkflowExecutionLogRecord"
