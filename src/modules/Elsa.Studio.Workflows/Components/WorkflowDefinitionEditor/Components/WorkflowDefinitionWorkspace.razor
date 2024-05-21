@@ -17,7 +17,7 @@
                                 ApplyEffectsToContainer>
 
                     <MudTabPanel Text="@SelectedWorkflowDefinition.Name" ShowCloseIcon="false" Style="height: 100%">
-                        @if (!IsReadOnly)
+                        @if (!IsReadOnly && Permissions.CanExecuteOperation("publish"))
                         {
                             <WorkflowEditor @key="SelectedWorkflowDefinition.DefinitionId" @ref="WorkflowEditor" WorkflowDefinition="SelectedWorkflowDefinition" WorkflowDefinitionUpdated="OnWorkflowDefinitionUpdated" WorkflowDefinitionExecuted="WorkflowDefinitionExecuted"/>
                         }

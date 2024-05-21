@@ -48,9 +48,13 @@ public abstract class JsInteropBase : IAsyncDisposable
             var module = await _moduleTask.Value;
             await func(module);
         }
-        catch (JSException )
+        catch (JSException)
         {
             // Ignore.
+        }
+        catch (TaskCanceledException)
+        {
+            
         }
     }
     

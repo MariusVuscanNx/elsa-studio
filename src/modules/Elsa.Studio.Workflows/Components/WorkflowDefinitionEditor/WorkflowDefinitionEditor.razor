@@ -7,7 +7,7 @@
 
 @inject IWorkflowDefinitionService WorkflowDefinitionService
 
-@if (IsReadOnly)
+@if (_permissions.CanExecuteOperation("publish"))
 {
     <MudAlert Severity="Severity.Warning" Variant="MudBlazor.Variant.Filled" Square="true" Class="py-1" Icon="@Icons.Material.Filled.EnergySavingsLeaf">Unable to make changes as the workflow or application is currently in read-only mode.</MudAlert>
 }
@@ -52,12 +52,12 @@
     [Parameter]
     public EventCallback<string> WorkflowDefinitionExecuted { get; set; }
 
-    /// <inheritdoc />
-    public bool IsReadOnly => _workflowDefinition != null && (_workflowDefinition?.Links.Count(l=>l.Rel == "publish") ?? 0) == 0;
+    private ApiOperationPermissions _permissions { get; set; } = new();
     
     /// <inheritdoc />
     protected override async Task OnParametersSetAsync()
     {
         _workflowDefinition = await WorkflowDefinitionService.FindByDefinitionIdAsync(DefinitionId, VersionOptions.Latest);
+        _permissions = new ApiOperationPermissions(_workflowDefinition?.Links ?? []);
     }
 }

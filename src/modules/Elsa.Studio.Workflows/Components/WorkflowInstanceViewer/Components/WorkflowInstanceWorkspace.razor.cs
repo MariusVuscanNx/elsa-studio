@@ -1,9 +1,8 @@
 using System.Text.Json.Nodes;
-using Elsa.Api.Client.Extensions;
-using Elsa.Api.Client.Resources.ActivityExecutions.Models;
 using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
 using Elsa.Api.Client.Resources.WorkflowInstances.Models;
 using Elsa.Studio.Workflows.Components.WorkflowDefinitionEditor.Components;
+using Elsa.Studio.Workflows.Models;
 using Elsa.Studio.Workflows.Pages.WorkflowInstances.View.Models;
 using Elsa.Studio.Workflows.Shared.Args;
 using Elsa.Studio.Workflows.UI.Contracts;
@@ -31,6 +30,7 @@ public partial class WorkflowInstanceWorkspace : IWorkspace
     [Parameter] public EventCallback<string> EditWorkflowDefinition { get; set; }
 
     public bool IsReadOnly => true;
+    public ApiOperationPermissions Permissions { get; set; } = new();
     private int ActiveTabIndex { get; } = 0;
     private IDictionary<string, WorkflowEditor> WorkflowEditors { get; } = new Dictionary<string, WorkflowEditor>();
 

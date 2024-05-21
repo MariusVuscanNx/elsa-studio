@@ -1,7 +1,7 @@
 @inherits StudioComponentBase
 @using Variant = MudBlazor.Variant
 
-@if (IsReadOnlyMode)
+@if (!_permissions.CanExecuteOperation("bulk-publish"))
 {
     <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Square="true" Class="py-1" Icon="@Icons.Material.Filled.EnergySavingsLeaf">You are running in read-only mode. Workflow operations are disabled.</MudAlert>
 }
@@ -28,10 +28,10 @@
         @bind-SelectedItems="_selectedRows">
         <ToolBarContent>
             <MudMenu EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Label="Bulk actions" Color="Color.Default" Variant="Variant.Filled">
-                <MudMenuItem Disabled="IsReadOnlyMode" OnClick="@OnBulkDeleteClicked">Delete</MudMenuItem>
-                <MudMenuItem Disabled="IsReadOnlyMode" OnClick="@OnBulkPublishClicked">Publish</MudMenuItem>
-                <MudMenuItem Disabled="IsReadOnlyMode" OnClick="@OnBulkRetractClicked">Unpublish</MudMenuItem>
-                <MudMenuItem OnClick="@OnBulkExportClicked">Export</MudMenuItem>
+                <MudMenuItem Disabled="@(!_permissions.CanExecuteOperation("bulk-delete-by-definition-id"))" OnClick="@OnBulkDeleteClicked">Delete</MudMenuItem>
+                <MudMenuItem Disabled="@(!_permissions.CanExecuteOperation("bulk-publish"))" OnClick="@OnBulkPublishClicked">Publish</MudMenuItem>
+                <MudMenuItem Disabled="@(!_permissions.CanExecuteOperation("bulk-retract"))" OnClick="@OnBulkRetractClicked">Unpublish</MudMenuItem>
+                <MudMenuItem Disabled="@(!_permissions.CanExecuteOperation("bulk-export"))" OnClick="@OnBulkExportClicked">Export</MudMenuItem>
             </MudMenu>
             <MudSpacer/>
 
@@ -49,9 +49,9 @@
                 Style="height: 36.5px;"
                 ValueChanged="@OnSearchTermChanged"/>
 
-            <MudButtonGroup Color="@(IsReadOnlyMode ? Color.Default : Color.Primary)" Variant="Variant.Filled" DisableElevation="false">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OnCreateWorkflowClicked" Disabled="IsReadOnlyMode">Create workflow</MudButton>
-                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Disabled="IsReadOnlyMode">
+            <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled" DisableElevation="false">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OnCreateWorkflowClicked" Disabled="@(!_permissions.CanExecuteOperation("create"))">Create workflow</MudButton>
+                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Disabled="@(!_permissions.CanExecuteOperation("import-files"))">
                     <MudTooltip Text="Upload JSON and/or ZIP files containing workflow data to import." Inline="false" Delay="1000">
                         <MudMenuItem Icon="@Icons.Material.Filled.FileUpload" OnClick="@OnImportClicked">Import</MudMenuItem>
                     </MudTooltip>
@@ -96,7 +96,7 @@
             </MudTd>
             <MudTd DataLabel="" Style="text-align:right">
                 <MudMenu Icon="@Icons.Material.Filled.MoreVert">
-                    @if (!IsReadOnlyMode && !context.IsReadOnlyMode)
+                    @if (context.Permissions.CanExecuteOperation("publish"))
                     {
                         <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => OnEditClicked(context.DefinitionId))">Edit</MudMenuItem>
                     }
@@ -104,13 +104,13 @@
                     {
                         <MudMenuItem Icon="@Icons.Material.Outlined.Pageview" OnClick="@(() => OnEditClicked(context.DefinitionId))">View</MudMenuItem>
                     }
-                    <MudMenuItem Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => OnDeleteClicked(context))" Disabled="IsReadOnlyMode || context.IsReadOnlyMode">Delete</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => OnDeleteClicked(context))" Disabled="@(!context.Permissions.CanExecuteOperation("delete"))">Delete</MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Outlined.Cancel" OnClick="@(() => OnCancelClicked(context))">Cancel</MudMenuItem>
                     <MudDivider DividerType="DividerType.FullWidth"></MudDivider>
-                    <MudMenuItem Icon="@Icons.Material.Outlined.CloudUpload" OnClick="@(() => OnPublishClicked(context.DefinitionId))" Disabled="IsReadOnlyMode || context.IsReadOnlyMode">Publish</MudMenuItem>
-                    <MudMenuItem Icon="@Icons.Material.Outlined.CloudDownload" OnClick="@(() => OnRetractClicked(context.DefinitionId))" Disabled="IsReadOnlyMode || context.IsReadOnlyMode">Unpublish</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Outlined.CloudUpload" OnClick="@(() => OnPublishClicked(context.DefinitionId))" Disabled="@(!context.Permissions.CanExecuteOperation("publish"))">Publish</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Outlined.CloudDownload" OnClick="@(() => OnRetractClicked(context.DefinitionId))" Disabled="@(!context.Permissions.CanExecuteOperation("retract"))">Unpublish</MudMenuItem>
                     <MudDivider DividerType="DividerType.FullWidth"></MudDivider>
-                    <MudMenuItem Icon="@Icons.Material.Filled.FileDownload" OnClick="@(() => OnDownloadClicked(context))">Export</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.FileDownload" OnClick="@(() => OnDownloadClicked(context))" Disabled="@(!context.Permissions.CanExecuteOperation("export"))">Export</MudMenuItem>
 
                 </MudMenu>
             </MudTd>

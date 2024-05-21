@@ -1,6 +1,7 @@
 using Elsa.Api.Client.Resources.WorkflowDefinitions.Models;
 using Elsa.Api.Client.Shared.Models;
 using Elsa.Studio.Workflows.Domain.Contracts;
+using Elsa.Studio.Workflows.Models;
 using Elsa.Studio.Workflows.UI.Contracts;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -43,10 +44,11 @@ public partial class WorkflowDefinitionWorkspace : IWorkspace
     public event Func<Task>? WorkflowDefinitionUpdated;
 
     /// <inheritdoc />
-    public bool IsReadOnly => SelectedWorkflowDefinition != null 
-        && (SelectedWorkflowDefinition?.IsLatest == false 
-            || (SelectedWorkflowDefinition?.Links.Count(l => l.Rel == "publish") ?? 0) == 0);
+    public bool IsReadOnly => SelectedWorkflowDefinition?.IsLatest == false;
 
+    /// <inheritdoc />
+    public ApiOperationPermissions Permissions { get; set; }
+    
     [Inject] private IWorkflowDefinitionService WorkflowDefinitionService { get; set; } = default!;
 
     private WorkflowEditor WorkflowEditor { get; set; } = default!;
@@ -55,7 +57,10 @@ public partial class WorkflowDefinitionWorkspace : IWorkspace
     protected override void OnParametersSet()
     {
         if (SelectedWorkflowDefinition == null!)
+        {
             SelectedWorkflowDefinition = WorkflowDefinition;
+            Permissions = new ApiOperationPermissions(SelectedWorkflowDefinition?.Links ?? []);
+        }
     }
 
     /// <summary>
@@ -64,6 +69,7 @@ public partial class WorkflowDefinitionWorkspace : IWorkspace
     public void DisplayWorkflowDefinitionVersion(WorkflowDefinition workflowDefinition)
     {
         SelectedWorkflowDefinition = workflowDefinition;
+        Permissions = new ApiOperationPermissions(SelectedWorkflowDefinition?.Links ?? []);
 
         if (WorkflowDefinitionVersionSelected.HasDelegate)
             WorkflowDefinitionVersionSelected.InvokeAsync(SelectedWorkflowDefinition);
@@ -84,6 +90,7 @@ public partial class WorkflowDefinitionWorkspace : IWorkspace
         var definitionId = WorkflowDefinition.DefinitionId;
         var definition = await WorkflowDefinitionService.FindByDefinitionIdAsync(definitionId, VersionOptions.Latest);
         SelectedWorkflowDefinition = definition!;
+        Permissions = new ApiOperationPermissions(SelectedWorkflowDefinition?.Links ?? []);
         StateHasChanged();
     }
 
@@ -95,6 +102,7 @@ public partial class WorkflowDefinitionWorkspace : IWorkspace
     private async Task OnWorkflowDefinitionUpdated()
     {
         SelectedWorkflowDefinition = WorkflowEditor.WorkflowDefinition!;
+        Permissions = new ApiOperationPermissions(SelectedWorkflowDefinition?.Links ?? []);
         StateHasChanged();
 
         if (WorkflowDefinitionUpdated != null)
